@@ -1,32 +1,46 @@
-# Sistema de Control de Flujo de Efectivo y Presupuestos para PyMEs
+# Sistema de control de flujo de efectivo para mueblerías
 
-Este es el repositorio inicial para la **Residencia Profesional** del TecNM Campus Chicontepec.
+Aplicación bilingüe para registrar movimientos de efectivo y consultar el flujo del negocio. El sistema usa una API Flask con autenticación JWT y una interfaz React.
 
-## Objetivo
-Desarrollar una aplicación web sencilla que permita a micro y pequeñas empresas registrar ingresos, gastos, presupuestos y proyecciones de flujo de efectivo, facilitando decisiones financieras informadas.
+## Stack
 
-## Stack Tecnológico (propuesto)
-- **Frontend:** React + Vite, Tailwind CSS, Chart.js
-- **Backend:** Python 3.13 + Flask, Flask‑SQLAlchemy, Flask‑JWT‑Extended
-- **Base de datos:** SQLite (desarrollo) → PostgreSQL (producción)
+- Frontend: React, Vite, Tailwind CSS, React Router y react-i18next.
+- Backend: Python 3.13, Flask, Flask-SQLAlchemy y Flask-JWT-Extended.
+- Desarrollo: SQLite. Producción: PostgreSQL mediante `DATABASE_URL`.
 
-## Estructura del proyecto (inicial)
+## Desarrollo local
+
+Requiere Node.js/npm y Python 3.13. Desde la raíz, abre una terminal para cada servidor.
+
+### Backend
+
+```powershell
+py -3.13 -m venv backend/.venv
+& .\backend\.venv\Scripts\python.exe -m pip install -r .\backend\requirements.txt
+Copy-Item backend/.env.example backend/.env
+& .\backend\.venv\Scripts\python.exe .\backend\seed_data.py
+& .\backend\.venv\Scripts\python.exe .\backend\run.py
 ```
-Proyecto_Recidencias_Itzel/
-├── backend/          # Código del servidor Flask
-├── frontend/         # Aplicación React
-├── docs/             # Documentación (modelo ER, manuales, etc.)
-├── .gitignore
-└── README.md
+
+La API queda en `http://127.0.0.1:5000`. La primera ejecución crea SQLite, la empresa, el usuario dueño y las categorías de mueblería. Con los valores del `.env.example`, el acceso inicial es `dueno@muebleria.com` / `CambiarEsta123`; cambia esa contraseña antes de usar datos reales.
+
+### Frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
 ```
 
-## Próximos pasos
-1. Inicializar repositorio Git (`git init`).
-2. Crear entorno virtual Python y instalar dependencias.
-3. Generar la aplicación React con Vite.
-4. Definir modelos de base de datos y API.
-5. Implementar UI y lógica de negocio.
+Abre `http://localhost:5173`. Vite reenvía `/api` a `http://127.0.0.1:5000`; para otro host local, define `VITE_BACKEND_URL` antes de iniciar Vite. En producción, `VITE_API_URL` puede apuntar a la ruta pública de la API.
 
----
+## Integración disponible
 
-*Esta es solo la base; los archivos y carpetas reales se irán añadiendo a medida que avancemos.*
+- `POST /api/auth/login` inicia sesión y devuelve el token y perfil.
+- `GET /api/auth/perfil` restaura una sesión persistida.
+- `GET /api/dashboard/resumen` entrega totales, actividad y datos por rol.
+- `GET/POST /api/transacciones` lista y registra movimientos.
+- `GET /api/categorias` carga las categorías de la empresa.
+- `GET /api/salud` verifica el estado del backend.
+
+El backend valida los permisos aunque el frontend oculte opciones: el cajero queda limitado a los movimientos del día y no recibe datos exclusivos del dueño.
